@@ -14,7 +14,7 @@
       file: state=absent path="~/git/ose3-ticket-monster"
       tags: ['git']
     - name: clone ticketmonster repo
-      git: repo=http://git-devops-tools.{{ ocp_apps_dns_domain }}/ose3-ticket-monster.git dest=~/git/ose3-ticket-monster
+      git: repo=http://git-devops-tools.apps.{{ hailstorm_dns_domain }}/ose3-ticket-monster.git dest=~/git/ose3-ticket-monster
       tags: ['git']
     - name: log in to openshift
       shell: oc login --insecure-skip-tls-verify https://openshift.{{ hailstorm_dns_domain }}:443 --username=developer --password={{ root_password }}
