@@ -10,20 +10,14 @@
     - name: create ~/git directory
       file: state=directory path="~/git"
       tags: ['git']
-      register: gitdir
-    - name: get git remote server
-      shell: cd ~/git/ose3-ticket-monster && git remote get-url origin | awk 'match($0, /\@.*/) { print substr($0, RSTART+1, RLENGTH-25) }'
-      register: git_remote_server
-      when: not gitdir|changed
-      changed_when: false
-    - block:
-        - name: remove existing ticketmonster repo
-          file: state=absent path="~/git/ose3-ticket-monster"
-          tags: ['git']
-        - name: clone ticketmonster repo
-          git: repo=http://{{ gitroute.stdout }}/ose3-ticket-monster.git dest=~/git/ose3-ticket-monster
-          tags: ['git']
-      when: gitdir|changed or git_remote_server.stdout != gitroute.stdout
+    - name: remove existing ticketmonster repo
+      file: state=absent path="~/git/ose3-ticket-monster"
+      tags: ['git']
+    - name: clone ticketmonster repo
+      git: repo=http://git-devops-tools.apps.{{ hailstorm_dns_domain }}/ose3-ticket-monster.git dest=~/git/ose3-ticket-monster
+      tags: ['git']
+    - name: log in to openshift
+      shell: oc login --insecure-skip-tls-verify https://openshift.{{ hailstorm_dns_domain }}:443 --username=developer --password={{ root_password }}
     - name: change repo remote URL
       shell: cd ~/git/ose3-ticket-monster && git remote set-url origin http://$(oc whoami ):$(oc whoami -t)@{{ gitroute.stdout }}/ose3-ticket-monster.git
     - name: revert git repo to known state & push
